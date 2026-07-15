@@ -61,6 +61,8 @@
 Adafruit_NeoPixel pixels(10, 15, NEO_GRB + NEO_KHZ800);
 
 #include "Free_Fonts.h"
+#include <SPIFFS.h>
+#include "SmoothFonts.h"
 #include "IniFile.h"
 #include "M5NSconfig.h"
 #include "M5NSWebConfig.h"
@@ -601,7 +603,7 @@ void buttons_test() {
     M5.Lcd.fillRect(110, 220, 100, 20, TFT_WHITE);
     M5.Lcd.setTextDatum(TL_DATUM);
     M5.Lcd.setTextSize(1);
-    M5.Lcd.setFreeFont(FSSB12);
+    M5.Lcd.loadFont(NSF_SB12);
     M5.Lcd.setTextColor(TFT_BLACK, TFT_WHITE);
     char tmpStr[10];
     int snoozeRemaining = 0;
@@ -648,7 +650,7 @@ void buttons_test() {
       char tmpstr[32];
       while(M5.BtnC.read()) {
         M5.Lcd.setTextSize(1);
-        M5.Lcd.setFreeFont(FSSB12);
+        M5.Lcd.loadFont(NSF_SB12);
         // M5.Lcd.fillRect(110, 220, 100, 20, TFT_RED);
         // M5.Lcd.fillRect(0, 220, 320, 20, TFT_RED);
         M5.Lcd.setTextColor(TFT_WHITE, TFT_BLACK);
@@ -1437,7 +1439,7 @@ void handleAlarmsInfoLine(struct NSinfo *ns) {
       M5.Lcd.fillRect(icon_xpos[1], icon_ypos[1], 16, 16, BLACK);
   }
   M5.Lcd.setTextSize(1);
-  M5.Lcd.setFreeFont(FSSB12);
+  M5.Lcd.loadFont(NSF_SB12);
   // prapare intensity variables for LED strip brightness
   int maxint = 255;
   maxint *= cfg.LED_strip_brightness;
@@ -1729,7 +1731,7 @@ void draw_page() {
       
       // readNightscout(cfg.url, cfg.token, &ns);
   
-      M5.Lcd.setFreeFont(FSSB12);
+      M5.Lcd.loadFont(NSF_SB12);
       M5.Lcd.setTextSize(1);
       M5.Lcd.setTextColor(TFT_LIGHTGREY, TFT_BLACK);
       // char dateStr[30];
@@ -1799,11 +1801,11 @@ void draw_page() {
       M5.Lcd.drawString(cfg.userName, 0, 24, GFXFF);
       
       if(cfg.show_COB_IOB) {
-        M5.Lcd.setFreeFont(FSSB12);
+        M5.Lcd.loadFont(NSF_SB12);
         M5.Lcd.setTextSize(1);
         // show small delta right from name
         /*
-        M5.Lcd.setFreeFont(FSSB12);
+        M5.Lcd.loadFont(NSF_SB12);
         M5.Lcd.setTextColor(WHITE, BLACK);
         M5.Lcd.setTextSize(1);
         M5.Lcd.fillRect(130,24,69,23,TFT_BLACK);
@@ -1835,23 +1837,23 @@ void draw_page() {
         M5.Lcd.drawString(tmpstr, 0, 72, GFXFF);
 
         // show BIG delta below the name
-        M5.Lcd.setFreeFont(FSSB24);
+        M5.Lcd.loadFont(NSF_SB24);
         // strcpy(ns.delta_display, "+8.9");
         if(ns.delta_mgdl>7)
           M5.Lcd.setTextColor(TFT_WHITE, BLACK);
         else
           M5.Lcd.setTextColor(TFT_LIGHTGREY, BLACK);
         M5.Lcd.drawString(ns.delta_display, 103, 48, GFXFF);
-        M5.Lcd.setFreeFont(FSSB12);
+        M5.Lcd.loadFont(NSF_SB12);
 
       } else {
         // show BIG delta below the name
-        M5.Lcd.setFreeFont(FSSB24);
+        M5.Lcd.loadFont(NSF_SB24);
         M5.Lcd.setTextColor(TFT_LIGHTGREY, BLACK);
         M5.Lcd.setTextSize(1);
         M5.Lcd.fillRect(0,48+10,199,47,TFT_BLACK);
         M5.Lcd.drawString(ns.delta_display, 0, 48+10, GFXFF);
-        M5.Lcd.setFreeFont(FSSB12);
+        M5.Lcd.loadFont(NSF_SB12);
       }
 
       // calculate sensor time difference
@@ -1874,7 +1876,7 @@ void draw_page() {
 
       M5.Lcd.fillRoundRect(200,0,120,90,15,tdColor);
       M5.Lcd.setTextSize(1);
-      M5.Lcd.setFreeFont(FSSB24);
+      M5.Lcd.loadFont(NSF_SB24);
       M5.Lcd.setTextDatum(MC_DATUM);
       M5.Lcd.setTextColor(TFT_BLACK, tdColor);
       if(sensorDifMin>99) {
@@ -1883,7 +1885,7 @@ void draw_page() {
         M5.Lcd.drawNumber(sensorDifMin, 260, 32, GFXFF);
       }
       M5.Lcd.setTextSize(1);
-      M5.Lcd.setFreeFont(FSSB12);
+      M5.Lcd.loadFont(NSF_SB12);
       M5.Lcd.setTextDatum(MC_DATUM);
       M5.Lcd.setTextColor(TFT_BLACK, tdColor);
       M5.Lcd.drawString("min", 260, 70, GFXFF);
@@ -1900,7 +1902,7 @@ void draw_page() {
       Serial.println(tmpstr);
       
       M5.Lcd.fillRect(0, 110, 320, 114, TFT_BLACK);
-      M5.Lcd.setTextSize(2);
+      M5.Lcd.setTextSize(1);
       M5.Lcd.setTextDatum(TL_DATUM);
       M5.Lcd.setTextColor(glColor, TFT_BLACK);
       char sensSgvStr[30];
@@ -1915,10 +1917,10 @@ void draw_page() {
       // Serial.print("SGV string length = "); Serial.print(strlen(sensSgvStr));
       // Serial.print(", smaller_font = "); Serial.println(smaller_font);
       if( smaller_font ) {
-        M5.Lcd.setFreeFont(FSSB18);
+        M5.Lcd.loadFont(NSF_SB36);
         M5.Lcd.drawString(sensSgvStr, 0, 130, GFXFF);
       } else {
-        M5.Lcd.setFreeFont(FSSB24);
+        M5.Lcd.loadFont(NSF_SB48);
         M5.Lcd.drawString(sensSgvStr, 0, 120, GFXFF);
       }
       int tw=M5.Lcd.textWidth(sensSgvStr);
@@ -1962,7 +1964,7 @@ void draw_page() {
       Serial.println(tmpstr);
       
       M5.Lcd.fillRect(0, 40, 320, 180, TFT_BLACK);
-      M5.Lcd.setTextSize(4);
+      M5.Lcd.setTextSize(1);
       M5.Lcd.setTextDatum(MC_DATUM);
       M5.Lcd.setTextColor(glColor, TFT_BLACK);
       char sensSgvStr[30];
@@ -1970,24 +1972,24 @@ void draw_page() {
       if( cfg.show_mgdl ) {
         if(ns.sensSgvMgDl<100) {
           sprintf(sensSgvStr, "%2.0f", ns.sensSgvMgDl);
-          M5.Lcd.setFreeFont(FSSB24);
+          M5.Lcd.loadFont(NSF_SB96);
         } else {
           sprintf(sensSgvStr, "%3.0f", ns.sensSgvMgDl);
-          M5.Lcd.setFreeFont(FSSB24);
+          M5.Lcd.loadFont(NSF_SB96);
         }
       } else {
         if(ns.sensSgv<10) {
           sprintf(sensSgvStr, "%3.1f", ns.sensSgv);
-          M5.Lcd.setFreeFont(FSSB24);
+          M5.Lcd.loadFont(NSF_SB96);
         } else {
           sprintf(sensSgvStr, "%4.1f", ns.sensSgv);
-          M5.Lcd.setFreeFont(FSSB18);
+          M5.Lcd.loadFont(NSF_SB72);
         }
       }
       M5.Lcd.drawString(sensSgvStr, 160, 120, GFXFF);
-    
+
       M5.Lcd.fillRect(0, 0, 320, 40, TFT_BLACK);
-      M5.Lcd.setFreeFont(FSSB24);
+      M5.Lcd.loadFont(NSF_SB24);
       M5.Lcd.setTextSize(1);
       M5.Lcd.setTextDatum(TL_DATUM);
       M5.Lcd.setTextColor(TFT_LIGHTGREY, TFT_BLACK);
@@ -2050,18 +2052,18 @@ void draw_page() {
       if( cfg.show_mgdl ) {
         if(ns.sensSgvMgDl<100) {
           sprintf(sensSgvStr, "%2.0f", ns.sensSgvMgDl);
-          M5.Lcd.setFreeFont(FSSB24);
+          M5.Lcd.loadFont(NSF_SB24);
         } else {
           sprintf(sensSgvStr, "%3.0f", ns.sensSgvMgDl);
-          M5.Lcd.setFreeFont(FSSB24);
+          M5.Lcd.loadFont(NSF_SB24);
         }
       } else {
         if(ns.sensSgv<10) {
           sprintf(sensSgvStr, "%3.1f", ns.sensSgv);
-          M5.Lcd.setFreeFont(FSSB24);
+          M5.Lcd.loadFont(NSF_SB24);
         } else {
           sprintf(sensSgvStr, "%4.1f", ns.sensSgv);
-          M5.Lcd.setFreeFont(FSSB24); //18
+          M5.Lcd.loadFont(NSF_SB24); //18
         }
       }
       M5.Lcd.fillRect(0, 0, 100, 40, TFT_BLACK);
@@ -2106,7 +2108,7 @@ void draw_page() {
       // display time since last valid data
       M5.Lcd.fillRoundRect(0, 44, 68, 22, 7, tdColor);
       M5.Lcd.setTextSize(1);
-      M5.Lcd.setFreeFont(FSS9);
+      M5.Lcd.loadFont(NSF_S9);
       M5.Lcd.setTextDatum(MC_DATUM);
       M5.Lcd.setTextColor(TFT_BLACK, tdColor);
       if(sensorDifMin>99) {
@@ -2143,15 +2145,15 @@ void draw_page() {
         M5.Lcd.fillRect(0, 180, 88, 30, TFT_BLACK);
         if(tmprc!=float(0.01) && tmprc!=float(0.02) && tmprc!=float(0.03) && tmprc!=float(0.04)) { // not an error
           M5.Lcd.setTextDatum(BL_DATUM);
-          M5.Lcd.setFreeFont(FSS12); // CF_RT24
+          M5.Lcd.loadFont(NSF_S12); // CF_RT24
           M5.Lcd.setTextColor(TFT_LIGHTGREY, TFT_BLACK);
           String tmprcStr=String(tmprc, 1);
           int tw=M5.Lcd.textWidth(tmprcStr);
           M5.Lcd.drawString(tmprcStr, 7, 210, GFXFF);
-          M5.Lcd.setFreeFont(FSS9);
+          M5.Lcd.loadFont(NSF_S9);
           int ow=M5.Lcd.textWidth("o");
           M5.Lcd.drawString("o", 7+tw+2, 199, GFXFF);
-          M5.Lcd.setFreeFont(FSS12);
+          M5.Lcd.loadFont(NSF_S12);
           switch(cfg.temperature_unit) {
             case 1:
               M5.Lcd.drawString("C", 7+tw+ow+4, 210, GFXFF);
@@ -2170,7 +2172,7 @@ void draw_page() {
         M5.Lcd.fillRect(250, 185, 70, 25, TFT_BLACK);
         if(humid!=float(0.01) && humid!=float(0.02) && humid!=float(0.03) && humid!=float(0.04)) { // not an error
           M5.Lcd.setTextDatum(BR_DATUM);
-          M5.Lcd.setFreeFont(FSS12);
+          M5.Lcd.loadFont(NSF_S12);
           M5.Lcd.setTextColor(TFT_LIGHTGREY, TFT_BLACK);
           String humidStr=String(humid, 0);
           humidStr += "%";
@@ -2221,12 +2223,12 @@ void draw_page() {
       M5.Lcd.drawRoundRect(182, 97, 36, 26, 7, TFT_LIGHTGREY);
       M5.Lcd.setTextDatum(MC_DATUM);
       M5.Lcd.setTextColor(TFT_LIGHTGREY, TFT_BLACK);
-      M5.Lcd.setFreeFont(FSSB9);
+      M5.Lcd.loadFont(NSF_SB9);
       M5.Lcd.drawString(String(timeinfo.tm_mday), 200, 108, GFXFF);
     
       // draw name
       M5.Lcd.setTextDatum(MC_DATUM);
-      M5.Lcd.setFreeFont(FSSB9);
+      M5.Lcd.loadFont(NSF_SB9);
       M5.Lcd.setTextColor(TFT_DARKGREY, TFT_BLACK);
       M5.Lcd.drawString(cfg.userName, 160, 145, GFXFF);
   
@@ -2296,12 +2298,12 @@ void draw_page() {
       M5.Lcd.fillScreen(BLACK);
       M5.Lcd.setCursor(0, 18);
       M5.Lcd.setTextDatum(TL_DATUM);
-      M5.Lcd.setFreeFont(FMB9);
+      M5.Lcd.loadFont(NSF_MB9);
       M5.Lcd.setTextSize(1); 
       M5.Lcd.setTextColor(TFT_WHITE, TFT_BLACK);
       M5.Lcd.drawString("Date  Time  Error Log", 0, 0, GFXFF);
       // M5.Lcd.drawString("Error", 143, 0, GFXFF);
-      M5.Lcd.setFreeFont(FM9);
+      M5.Lcd.loadFont(NSF_M9);
       if(err_log_ptr==0) {
         M5.Lcd.setTextColor(TFT_LIGHTGREY, TFT_BLACK);
         M5.Lcd.drawString("no errors in log", 0, 20, GFXFF);
@@ -2334,7 +2336,7 @@ void draw_page() {
           }
           M5.Lcd.drawString(tmpStr, 132, 20+i*18, GFXFF);
         }
-        M5.Lcd.setFreeFont(FMB9);
+        M5.Lcd.loadFont(NSF_MB9);
         M5.Lcd.setTextColor(TFT_WHITE, TFT_BLACK);
         sprintf(tmpStr, "Total errors %d", err_log_count);
         M5.Lcd.drawString(tmpStr, 0, 20+maxErrDisp*18, GFXFF);
@@ -2371,6 +2373,11 @@ void draw_page() {
 void setup() {
     // initialize the M5Stack object
     M5.begin(true, true, true, true);
+
+    // mount SPIFFS for the anti-aliased smooth fonts in /data (see SmoothFonts.h)
+    if(!SPIFFS.begin(true)) {
+      Serial.println("SPIFFS mount failed - smooth fonts won't load, check the partition scheme has a SPIFFS partition and that the filesystem image (data/) was uploaded.");
+    }
     #ifdef ARDUINO_M5STACK_Core2
       M5.Axp.SetSpkEnable(true);
       InitI2SSpeakOrMic(MODE_SPK);
@@ -2652,6 +2659,7 @@ void loop() {
         readNightscout(cfg.url, cfg.token, &ns);
         if(rcnt==4) {
           M5.Lcd.fillScreen(BLACK);
+          M5.Lcd.unloadFont(); // drop any smooth font left loaded by draw_page() so this uses the built-in font
           M5.Lcd.setTextColor(WHITE);
           M5.Lcd.setCursor(0, 140);
           M5.Lcd.setTextSize(2);
@@ -2700,7 +2708,7 @@ void loop() {
       }
       if((dispPage==0) && cfg.show_current_time) {
         // update current time on display
-        M5.Lcd.setFreeFont(FSSB12);
+        M5.Lcd.loadFont(NSF_SB12);
         M5.Lcd.setTextSize(1);
         M5.Lcd.setTextColor(TFT_LIGHTGREY, TFT_BLACK);
         if(getLocalTime(&localTimeInfo)) {
@@ -2789,7 +2797,7 @@ void loop() {
           // draw day
           M5.Lcd.drawRoundRect(182, 97, 36, 26, 7, TFT_LIGHTGREY);
           M5.Lcd.setTextDatum(MC_DATUM);
-          M5.Lcd.setFreeFont(FSSB9);
+          M5.Lcd.loadFont(NSF_SB9);
           M5.Lcd.setTextColor(TFT_LIGHTGREY, TFT_BLACK);
           M5.Lcd.drawString(String(localTimeInfo.tm_mday), 200, 108, GFXFF);
        

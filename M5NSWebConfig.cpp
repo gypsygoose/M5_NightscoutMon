@@ -15,6 +15,7 @@
 #define ARDUINOJSON_USE_LONG_LONG 1
 #include <ArduinoJson.h>
 #include "Free_Fonts.h"
+#include "SmoothFonts.h"
 #include "IniFile.h"
 #include "M5NSconfig.h"
 #include "M5NSWebConfig.h"
@@ -341,7 +342,7 @@ void handleUpdate() {
   M5.Lcd.setTextColor(WHITE);
   M5.Lcd.setCursor(0, 18);
   M5.Lcd.setTextSize(1);
-  M5.Lcd.setFreeFont(FMB9);
+  M5.Lcd.loadFont(NSF_MB9);
   M5.Lcd.setTextDatum(TL_DATUM);
   M5.Lcd.println("FIRMWARE UPDATE");
   M5.Lcd.println();
