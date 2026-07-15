@@ -19,21 +19,21 @@ struct tConfig {
   int dst = 0; // DST time offset in hours, must be corrected for internatinal use and DST
   int show_mgdl = 0; // 0 = display mg/DL, 1 = diplay mmol/L
   int sgv_only = 0; // 1 = filter only SGV values from Nightscout, 0 = read everything (default)
-  int default_page = 0; // page number displayed after startup
+  int default_page = 1; // page number displayed after startup
   char restart_at_time[10]; // time in HH:MM format when the device will restart
   int restart_at_logged_errors = 0; // restart device after particular number of errors in the log (0 = do not restart)
   int show_current_time = 0; // show currnet time instead of last valid data time_
   int show_COB_IOB = 0; // show COB and IOB, values are grayed out if COB/IOB value is 0
   int snooze_timeout = 30; // timeout to snooze alarm in minutes
   int alarm_repeat = 5; // repeat alarm every X minutes
-  float yellow_low = 4.5;
-  float yellow_high = 9;
-  float red_low = 3.9;
-  float red_high = 11;
-  float snd_warning = 3.7;
-  float snd_alarm = 3.0;
-  float snd_warning_high = 14;
-  float snd_alarm_high = 20;
+  float yellow_low = 5.0;
+  float yellow_high = 10;
+  float red_low = 4.0;
+  float red_high = 12;
+  float snd_warning = 4.5;
+  float snd_alarm = 4.0;
+  float snd_warning_high = 12;
+  float snd_alarm_high = 15;
   int snd_no_readings = 20;
   int snd_loop_error = 1; 
   int snd_warning_at_startup = 1;

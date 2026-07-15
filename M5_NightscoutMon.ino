@@ -33,6 +33,7 @@
 // M5Stack Arduino / M5Stack-Core-ESP32
 // M5Stack Arduino / M5Stack-Core2
 
+#define ARDUINO_M5STACK_Core2
 #include <Arduino.h>
 #ifdef ARDUINO_M5STACK_Core2
   #include <M5Core2.h>
@@ -88,6 +89,10 @@ String M5NSversion("2022100201");
 #define VIBfreq 10000
 #define VIBchannel 14
 #define VIBresolution 10
+
+// Hardcoded Nightscout refresh interval (seconds), replaces the "refresh"
+// INI setting that used to come from the SD card config.
+#define NS_REFRESH_INTERVAL_SEC 60
 
 // The UDP library class
 WiFiUDP udp;
@@ -301,16 +306,14 @@ uint16_t calcCRC(char* str)
 void startupLogo() {
     // static uint8_t brightness, pre_brightness;
     lcdSetBrightness(0);
-    if(!SD.exists(cfg.bootPic)) {
-      // M5.Lcd.pushImage(0, 0, 320, 240, (uint16_t *)gImage_logoM5);
-      M5.Lcd.clear();
-      M5.Lcd.setTextColor(TFT_WHITE, TFT_BLACK);
-      M5.Lcd.drawString("M5 Stack", 120, 60, GFXFF);
-      M5.Lcd.drawString("Nightscout monitor", 60, 80, GFXFF);
-      M5.Lcd.drawString("(c) 2019-21 Martin Lukasek", 0, 120, GFXFF);
-    } else {
-      M5.Lcd.drawJpgFile(SD, cfg.bootPic);
-    }
+    // No SD card in this build: always draw the text splash screen instead
+    // of trying to load a boot logo JPG from SD.
+    // M5.Lcd.pushImage(0, 0, 320, 240, (uint16_t *)gImage_logoM5);
+    M5.Lcd.clear();
+    M5.Lcd.setTextColor(TFT_WHITE, TFT_BLACK);
+    M5.Lcd.drawString("M5 Stack", 120, 60, GFXFF);
+    M5.Lcd.drawString("Nightscout monitor", 60, 80, GFXFF);
+    M5.Lcd.drawString("(c) 2019-21 Martin Lukasek", 0, 120, GFXFF);
     lcdSetBrightness(100);
     #ifndef ARDUINO_M5STACK_Core2  // no .update() on M5Stack CORE2
       M5.update();
@@ -2378,7 +2381,9 @@ void setup() {
     // prevent button A "ghost" random presses on older versions
     Wire.begin();
     
-    SD.begin();
+    // SD card support disabled: this build has no card reader, all
+    // configuration is hardcoded below instead of being read from SD.
+    // SD.begin();
     // M5.Speaker.mute();
 
     // Lcd display
@@ -2397,35 +2402,33 @@ void setup() {
 
     Serial.print("Free Heap: "); Serial.println(ESP.getFreeHeap());
 
-    uint8_t cardType = SD.cardType();
+    // No SD card in this build: skip card detection entirely so a missing
+    // reader never blocks startup.
+    // uint8_t cardType = SD.cardType();
+    // if(cardType == CARD_NONE){
+    //   Serial.println("No SD card attached");
+    //   M5.Lcd.println("No SD card attached");
+    // } else {
+    //   ...
+    // }
 
-    if(cardType == CARD_NONE){
-      Serial.println("No SD card attached");
-      M5.Lcd.println("No SD card attached");
-    } else {
-      Serial.print("SD Card Type: ");
-      M5.Lcd.print("SD Card Type: ");
-      if(cardType == CARD_MMC){
-          Serial.println("MMC");
-          M5.Lcd.println("MMC");
-      } else if(cardType == CARD_SD){
-          Serial.println("SDSC");
-          M5.Lcd.println("SDSC");
-      } else if(cardType == CARD_SDHC){
-          Serial.println("SDHC");
-          M5.Lcd.println("SDHC");
-      } else {
-          Serial.println("UNKNOWN");
-          M5.Lcd.println("UNKNOWN");
-      }
-      uint64_t cardSize = SD.cardSize() / (1024 * 1024);
-      Serial.printf("SD Card Size: %llu MB\r\n", cardSize);
-      M5.Lcd.printf("SD Card Size: %llu MB\r\n", cardSize);
-    }
+    // readConfiguration(iniFilename, &cfg); // would try to read /M5NS.INI from SD
 
-    readConfiguration(iniFilename, &cfg);
-    // strcpy(cfg.url, "https://sugarmate.io/api/v1/xxxxxx/latest.json");
-    // strcpy(cfg.url, "user.herokuapp.com"); 
+    // ---- Hardcoded configuration (no SD card / card reader available) ----
+    strcpy(cfg.url, "sugardaddy.biluta.ru");
+    strcpy(cfg.token, "");
+    strcpy(cfg.userName, "Gypsy");
+    strcpy(cfg.deviceName, "M5NS");
+    cfg.bootPic[0] = 0; // no boot logo file to load, use text splash screen
+    strcpy(cfg.restart_at_time, "03:30");
+    strcpy(cfg.wlanssid[0], "Gypsy");
+    strcpy(cfg.wlanpass[0], "pe4enyushka");
+    cfg.is_task_bootstrapping = 0; // WiFi credentials are hardcoded, skip AP config mode
+    // fields with no default member initializer, normally filled from
+    // Preferences/INI - set explicit defaults so the screen isn't dark
+    cfg.brightness1 = 50;
+    cfg.brightness2 = 100;
+    cfg.brightness3 = 10;
     // cfg.dev_mode = 0;
 
     #ifdef ARDUINO_M5STACK_Core2
@@ -2644,7 +2647,7 @@ void loop() {
       /* if(dispPage==2)
         M5.Lcd.drawLine(osx, osy, 160, 111, TFT_BLACK); // erase seconds hand while updating data
       */
-      if((sensorDifSec>305) && (rcnt>3)) {
+      if((sensorDifSec>NS_REFRESH_INTERVAL_SEC) && (rcnt>3)) {
         rcnt = 0;
         readNightscout(cfg.url, cfg.token, &ns);
         if(rcnt==4) {

@@ -62,22 +62,22 @@ void readConfigFromFlash(tConfig *cfg) {
     cfg->show_mgdl = prefs.getInt("show_mgdl", 0);
     cfg->show_current_time = prefs.getInt("show_cur_time", 1);
     cfg->show_COB_IOB = prefs.getInt("show_COB_IOB", 0);
-    cfg->default_page = prefs.getInt("default_page", 0);
+    cfg->default_page = prefs.getInt("default_page", 1);
     prefs.getString("restart_at_time", cfg->restart_at_time, 10);
     if(strlen(cfg->restart_at_time)==0)
       strcpy(cfg->restart_at_time, "03:30");
     cfg->restart_at_logged_errors = prefs.getInt("restart_log_err", 30);
     cfg->snooze_timeout = prefs.getInt("snooze_timeout", 30);
     cfg->alarm_repeat = prefs.getInt("alarm_repeat", 5);
-    cfg->yellow_low = prefs.getFloat("yellow_low", 4.5);
-    cfg->yellow_high = prefs.getFloat("yellow_high", 9.0);
-    cfg->red_low = prefs.getFloat("red_low", 3.9);
-    cfg->red_high = prefs.getFloat("red_high", 11.0);
-    cfg->snd_warning = prefs.getFloat("snd_warning", 3.7);
-    cfg->snd_alarm = prefs.getFloat("snd_alarm", 3.0);
-    cfg->snd_warning_high = prefs.getFloat("snd_warn_high", 14.0);
+    cfg->yellow_low = prefs.getFloat("yellow_low", 5.0);
+    cfg->yellow_high = prefs.getFloat("yellow_high", 10.0);
+    cfg->red_low = prefs.getFloat("red_low", 4.0);
+    cfg->red_high = prefs.getFloat("red_high", 12.0);
+    cfg->snd_warning = prefs.getFloat("snd_warning", 4.5);
+    cfg->snd_alarm = prefs.getFloat("snd_alarm", 4.0);
+    cfg->snd_warning_high = prefs.getFloat("snd_warn_high", 12.0);
     // Serial.printf("READ CFG Flash: cfg->snd_warning_high = %f\r\n", cfg->snd_warning_high);
-    cfg->snd_alarm_high = prefs.getFloat("snd_alarm_high", 20.0);
+    cfg->snd_alarm_high = prefs.getFloat("snd_alarm_high", 15.0);
     cfg->snd_no_readings = prefs.getInt("snd_no_readings", 20);
     cfg->snd_loop_error = prefs.getInt("snd_loop_error", 1);
     cfg->snd_warning_at_startup = prefs.getInt("snd_warn_start", 1);
@@ -248,10 +248,9 @@ void readConfiguration(const char *iniFilename, tConfig *cfg) {
     Serial.print(ini.getFilename());
     Serial.print(" not valid: ");
     printErrorMessage(ini.getError());
-    // Cannot do anything else
-    M5.Lcd.println("Bad INI file");
-    while (1)
-      ;
+    M5.Lcd.println("Bad INI file, using flash config instead");
+    readConfigFromFlash(cfg);
+    return;
   }
   
   // Fetch a value from a key which is present
@@ -360,7 +359,7 @@ void readConfiguration(const char *iniFilename, tConfig *cfg) {
   }
   else {
     Serial.println("NO default page defined -> page 0 is default");
-    cfg->default_page = 0;
+    cfg->default_page = 1;
   }
 
   if (ini.getValue("config", "restart_at_time", buffer, bufferLen)) {
@@ -442,7 +441,7 @@ void readConfiguration(const char *iniFilename, tConfig *cfg) {
   }
   else {
     Serial.println("NO yellow_low defined");
-    cfg->yellow_low = 4.5;
+    cfg->yellow_low = 5.0;
   }
 
   if (ini.getValue("config", "yellow_high", buffer, bufferLen)) {
@@ -454,7 +453,7 @@ void readConfiguration(const char *iniFilename, tConfig *cfg) {
   }
   else {
     Serial.println("NO yellow_high defined");
-    cfg->yellow_high = 9.0;
+    cfg->yellow_high = 10.0;
   }
 
   if (ini.getValue("config", "red_low", buffer, bufferLen)) {
@@ -466,7 +465,7 @@ void readConfiguration(const char *iniFilename, tConfig *cfg) {
   }
   else {
     Serial.println("NO red_low defined");
-    cfg->red_low = 3.9;
+    cfg->red_low = 4.0;
   }
 
   if (ini.getValue("config", "red_high", buffer, bufferLen)) {
@@ -478,7 +477,7 @@ void readConfiguration(const char *iniFilename, tConfig *cfg) {
   }
   else {
     Serial.println("NO red_high defined");
-    cfg->red_high = 9.0;
+    cfg->red_high = 10.0;
   }
 
   if (ini.getValue("config", "snd_warning", buffer, bufferLen)) {
@@ -490,7 +489,7 @@ void readConfiguration(const char *iniFilename, tConfig *cfg) {
   }
   else {
     Serial.println("NO snd_warning defined");
-    cfg->snd_warning = 3.7;
+    cfg->snd_warning = 4.5;
   }
 
   if (ini.getValue("config", "snd_alarm", buffer, bufferLen)) {
@@ -502,7 +501,7 @@ void readConfiguration(const char *iniFilename, tConfig *cfg) {
   }
   else {
     Serial.println("NO snd_alarm defined");
-    cfg->snd_alarm = 3.0;
+    cfg->snd_alarm = 4.0;
   }
 
   if (ini.getValue("config", "snd_warning_high", buffer, bufferLen)) {
@@ -514,7 +513,7 @@ void readConfiguration(const char *iniFilename, tConfig *cfg) {
   }
   else {
     Serial.println("NO snd_warning_high defined");
-    cfg->snd_warning_high = 14.0;
+    cfg->snd_warning_high = 12.0;
   }
 
   if (ini.getValue("config", "snd_alarm_high", buffer, bufferLen)) {
@@ -526,7 +525,7 @@ void readConfiguration(const char *iniFilename, tConfig *cfg) {
   }
   else {
     Serial.println("NO snd_alarm_high defined");
-    cfg->snd_alarm_high = 20.0;
+    cfg->snd_alarm_high = 15.0;
   }
 
   if (ini.getValue("config", "snd_no_readings", buffer, bufferLen)) {

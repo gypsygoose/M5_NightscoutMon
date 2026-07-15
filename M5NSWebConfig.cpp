@@ -937,7 +937,7 @@ void handleSaveConfig() {
   message += "</body>\r\n";
   message += "</html>\r\n";
   
-  M5.Lcd.drawJpgFile(SD, cfg.bootPic);
+  startupLogo(); // no SD card: draws the text splash screen instead of a boot logo JPG
 
   File srcFil, dstFil;
 

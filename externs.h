@@ -13,6 +13,7 @@ extern WiFiMulti WiFiMultiple;
 extern boolean mDNSactive;
 extern int8_t getBatteryLevel();
 extern void draw_page();
+extern void startupLogo();
 extern String M5NSversion;
 extern int dispPage;
 extern int maxPage;
