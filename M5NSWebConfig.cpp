@@ -632,11 +632,11 @@ void handleEditConfigItem() {
     if(String(w3srv.arg(0)).equals("timeZoneDST")) {
       message += "Time zone offset in seconds: \r\n";
       message += "<input type=\"text\" name=\"timeZone\" value=\"" + String(cfg.timeZone) + "\" size=\"6\" maxlength=\"6\"> \r\n";
-      message += "(for example 3600 for most of Europe)<br>\r\n";
+      message += "(for example 3600 for GMT+1)<br>\r\n";
       message += "(see <a href=\"https://www.epochconverter.com/timezones\">https://www.epochconverter.com/timezones</a>)<br>\r\n";
       message += "Daylight saving time offset: \r\n";
       message += "<input type=\"text\" name=\"dst\" value=\"" + String(cfg.dst) + "\" size=\"6\" maxlength=\"6\"> \r\n";
-      message += "(usually 0 in winter and 3600 in summer)<br>\r\n";
+      message += "(usually 0 for winter time and 3600 for summer time)<br>\r\n";
       message += "<font color=red>Warning: changes work only after save to M5NS.INI and reboot of the M5Stack device.</font><br>\r\n";
     }
     if(String(w3srv.arg(0)).equals("restartAt")) {

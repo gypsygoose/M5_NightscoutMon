@@ -57,7 +57,7 @@ void readConfigFromFlash(tConfig *cfg) {
     prefs.getString("device_name", cfg->deviceName, 32);
     if(strlen(cfg->deviceName)==0)
       strcpy(cfg->deviceName, "M5NS");
-    cfg->timeZone = prefs.getInt("time_zone", 3600);
+    cfg->timeZone = prefs.getInt("time_zone", 10800);
     cfg->dst = prefs.getInt("dst", 0);
     cfg->show_mgdl = prefs.getInt("show_mgdl", 0);
     cfg->show_current_time = prefs.getInt("show_cur_time", 1);
@@ -318,8 +318,8 @@ void readConfiguration(const char *iniFilename, tConfig *cfg) {
     Serial.println(cfg->timeZone);
   }
   else {
-    Serial.println("NO time zone defined -> Central Europe");
-    cfg->timeZone = 3600;
+    Serial.println("NO time zone defined -> GMT+3");
+    cfg->timeZone = 10800;
   }
 
   if (ini.getValue("config", "dst", buffer, bufferLen)) {
@@ -328,8 +328,8 @@ void readConfiguration(const char *iniFilename, tConfig *cfg) {
     Serial.println(cfg->dst);
   }
   else {
-    Serial.println("NO DST defined -> summer time");
-    cfg->dst = 3600;
+    Serial.println("NO DST defined -> regular time");
+    cfg->dst = 0;
   }
 
   if (ini.getValue("config", "show_mgdl", buffer, bufferLen)) {

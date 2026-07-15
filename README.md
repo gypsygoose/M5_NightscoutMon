@@ -52,8 +52,8 @@ name = YourName                     ; display name
 device_name = M5NS                  ; device name for mDNS, that can be used to  access the device from local
                                     ; intranet, use .local domain, eg. m5ns.local
 disable_web_server = 0              ; To disable internal Web server enter 'disable_web_server = 1'
-time_zone = 3600                    ; the time zone where you live in seconds (3600 is GMT+1, Prague)
-dst = 3600                          ; your daylight saving time offset (3600s is +1 hour)
+time_zone = 10800                    ; the time zone where you live in seconds (10800 is GMT+3, Moscow)
+dst = 0                          ; your daylight saving time offset (3600s is +1 hour)
 show_mgdl = 0                       ; use 0 to display values in mmol/L or 1 for mg/dl
 sgv_only = 0                        ; set to 1 if you use xDrip, Spike or similar to filter out calibrations
                                     ; etc., do not use with Tomato (set 0)
